@@ -79,6 +79,31 @@ input {
                         border-left: 2px solid black;
                         border-bottom: 2px solid black;
                         width: 1.5rem;
+                        position: relative;
+                        &.hidden {
+                            background-color: #e0e0e0; // or any color you prefer
+                            input {
+                                visibility: hidden;
+                            }
+                        }
+                        &.strike {
+                            background-color: black;
+                        }
+                        &.spare {
+                            background: white; // or your preferred background
+                            overflow: hidden;
+                            &::after {
+                                content: '';
+                                position: absolute;
+                                left: 0;
+                                bottom: 0;
+                                width: 0;
+                                height: 0;
+                                border-left: 40px solid transparent;  // width of the div
+                                border-bottom: 40px solid black;      // height and color of the triangle
+                                transform: rotate(0);
+                            }
+                        }
                     }
                 }
 

@@ -1,12 +1,13 @@
 <div class="main-container">
     <h3>Bowling Scoreboard</h3>
     <div class="scoreboard-container">
-        <div class="frame" *ngFor="let frame of [1,2,3,4,5,6,7,8,9,10]; let i = index">
-            <h1 class="frame-number">Frame {{ i + 1 }}</h1>
+        <div class="frame" *ngFor="let frame of frames; let i = index">
+            <h1 class="frame-number">Frame {{ frame.frameNumber }}</h1>
             <div class="score-container">
                 <div class="score-rolls">
                     <div class="first"><input type="number" name="" id=""></div>
-                    <div class="second"><input type="number" name="" id=""></div>
+                    <div class="second" [class.hidden]="frames[i].isStrike || frames[i].isSpare" [class.strike]="frames[i].isStrike" [class.spare]="frames[i].isSpare">
+                        <input type="number" name="" id=""></div>
                 </div>
 
                 <div class="box">
@@ -16,9 +17,9 @@
                     </div>
 
                     <div class="score-type">
-                        <input type="radio" id="strike" name="scoreType" value="strike">
+                        <input type="radio" id="strike" name="scoreType" value="strike" (click)="onRadiobuttonClick('strike', i)">
                         <label for="strike">Strike</label><br>
-                        <input type="radio" id="spare" name="scoreType" value="spare">
+                        <input type="radio" id="spare" name="scoreType" value="spare" (click)="onRadiobuttonClick('spare', i)">
                         <label for="spare">Spare</label><br>
                     </div>
                 </div>
