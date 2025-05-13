@@ -5,32 +5,53 @@
             <h1 class="frame-number">Frame {{ frame.frameNumber }}</h1>
             <div class="score-container">
                 <div class="score-rolls">
-                    <div class="first"><input type="number" name="" id="" [(ngModel)]="frame.firstRoll"
-                            (input)="calculateTotal(i)"></div>
-                    <div class="second" [class.hidden]="frames[i].isStrike || frames[i].isSpare"
-                        [class.strike]="frames[i].isStrike" [class.spare]="frames[i].isSpare">
-                        <input type="number" name="" id="" [(ngModel)]="frame.secondRoll" (input)="calculateTotal(i)">
+                    <div class="first">
+                        <input type="number" 
+                               name="" 
+                               id="" 
+                               [(ngModel)]="frame.firstRoll"
+                               (input)="onRollChange(i, 'firstRoll', frame.firstRoll)">
+                    </div>
+                    <div class="second" 
+                         [class.hidden]="frames[i].isStrike || frames[i].isSpare"
+                         [class.strike]="frames[i].isStrike" 
+                         [class.spare]="frames[i].isSpare">
+                        <input type="number" 
+                               name="" 
+                               id="" 
+                               [(ngModel)]="frame.secondRoll"
+                               (input)="onRollChange(i, 'secondRoll', frame.secondRoll)">
                     </div>
                 </div>
 
                 <div class="box">
                     <div class="score-total">
                         <label for="scoreTotal">Total</label>
-                        <input type="number" name="scoreTotal" id="scoreTotal" [ngModel]="frame.totalScore" readonly>
+                        <input type="number" 
+                               name="scoreTotal" 
+                               id="scoreTotal" 
+                               [ngModel]="frame.totalScore" 
+                               readonly>
                     </div>
 
                     <div class="score-type">
-                        <input type="radio" id="strike" name="scoreType" value="strike"
-                            (click)="onRadiobuttonClick('strike', i)">
-                        <label for="strike">Strike</label><br>
-                        <input type="radio" id="spare" name="scoreType" value="spare"
-                            (click)="onRadiobuttonClick('spare', i)">
-                        <label for="spare">Spare</label><br>
+                        <input type="radio" 
+                               [id]="'strike-' + i" 
+                               [name]="'scoreType-' + i" 
+                               value="strike"
+                               [checked]="frame.isStrike"
+                               (change)="onRadiobuttonClick('strike', i)">
+                        <label [for]="'strike-' + i">Strike</label><br>
+                        <input type="radio" 
+                               [id]="'spare-' + i" 
+                               [name]="'scoreType-' + i" 
+                               value="spare"
+                               [checked]="frame.isSpare"
+                               (change)="onRadiobuttonClick('spare', i)">
+                        <label [for]="'spare-' + i">Spare</label><br>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
-
 </div>

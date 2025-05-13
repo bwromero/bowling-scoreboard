@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Frame } from '../models/frame.interface';
+import { FrameStateService } from '../services/FrameStateService.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-scoreboard',
@@ -12,58 +14,30 @@ import { Frame } from '../models/frame.interface';
 })
 export class ScoreboardComponent {
 
-  frames: Frame[] = Array.from({ length: 10 }, (_, i) => ({
-    frameNumber: i + 1,
-    firstRoll: null,
-    secondRoll: null,
-    totalScore: null,
-    isStrike: false,
-    isSpare: false
-  }));
+  frames: Frame[] = [];
+  private subscription: Subscription = new Subscription();
 
+  constructor(private frameStateService: FrameStateService) {}
+
+  ngOnInit() {
+    // Subscribe to frames updates
+    this.subscription.add(
+      this.frameStateService.frames$.subscribe(frames => {
+        this.frames = frames;
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  onRollChange(frameIndex: number, rollType: 'firstRoll' | 'secondRoll', value: number | null) {
+    this.frameStateService.updateRoll(frameIndex, rollType, value);
+  }
 
   onRadiobuttonClick(type: 'strike' | 'spare', frameIndex: number) {
-    this.frames[frameIndex].isStrike = type === 'strike';
-    this.frames[frameIndex].isSpare = type === 'spare';
-
-    this.calculateTotal(frameIndex);
+    this.frameStateService.setFrameType(frameIndex, type);
   }
 
-  calculateTotal(frameIndex: number) {
-    const frame = this.frames[frameIndex];
-    let prevFrame = null;
-    const nextFrame = this.frames[frameIndex + 1];
-    //open frame
-    if (frame.firstRoll !== null && frame.secondRoll !== null && !frame.isStrike && !frame.isSpare) {
-      frame.totalScore = frame.firstRoll + frame.secondRoll;
-      if (frameIndex > 0) {
-        prevFrame = this.frames[frameIndex - 1];
-        if (prevFrame.totalScore !== null) {
-          frame.totalScore += prevFrame.totalScore;
-        }
-      }
-    }
-
-
-    //strike
-    if (frame.isStrike && frame.firstRoll !== null && frame.secondRoll == null) {
-
-    }
-
-    //spare
-    if (frame.isSpare) {
-      frame.secondRoll = null;
-
-      if(frameIndex == 0 && frame.firstRoll !== null) {
-        frame.totalScore = 10
-      }
-
-      if(frameIndex  > 0) { 
-        const prevFrameTotalScore = this.frames[frameIndex - 1].totalScore;
-        if(prevFrameTotalScore !== null && frame.firstRoll !== null && frame.firstRoll > 0) {
-          frame.totalScore = 10 + prevFrameTotalScore;
-        }
-      }
-    }
-  }
 }
