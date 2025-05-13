@@ -41,8 +41,15 @@ export class FrameStateService {
     // Update the roll
     this.updateFrame(frameIndex, { [rollType]: value });
 
-    // Calculate new total
-    this.calculateFrameTotal(frameIndex);
+    // If it's the first roll and spare is selected, set total to 10
+    if (rollType === 'firstRoll' && frame.isSpare) {
+        const previousFrameTotal = frameIndex > 0 ? (currentFrames[frameIndex - 1].totalScore || 0) : 0;
+        const newTotal = previousFrameTotal + 10;
+        this.updateFrame(frameIndex, { totalScore: newTotal });
+    } else {
+        // Calculate new total for other cases
+        this.calculateFrameTotal(frameIndex);
+    }
   }
 
   private calculateFrameTotal(frameIndex: number): void {
@@ -56,6 +63,10 @@ export class FrameStateService {
     } else if (frame.firstRoll !== null) {
       currentFrameScore = frame.firstRoll;
     }
+
+    if (frame.firstRoll !== null && frame.isSpare) {
+        currentFrameScore = 10;
+    } 
 
     // Add previous frame's total if it exists
     if (frameIndex > 0) {
@@ -100,6 +111,12 @@ export class FrameStateService {
             const previousFrameTotal = frameIndex > 0 ? (currentFrames[frameIndex - 1].totalScore || 0) : 0;
             const newTotal = previousFrameTotal + 10;
             this.updateFrame(frameIndex, { firstRoll: null, totalScore: newTotal });
+        }
+         // Set total to 10 for spare if first roll exists
+         else if (type === 'spare' && frame.firstRoll !== null) {
+            const previousFrameTotal = frameIndex > 0 ? (currentFrames[frameIndex - 1].totalScore || 0) : 0;
+            const newTotal = previousFrameTotal + 10;
+            this.updateFrame(frameIndex, { totalScore: newTotal });
         }
     }
 }
