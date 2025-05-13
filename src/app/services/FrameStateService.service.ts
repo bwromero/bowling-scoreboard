@@ -148,7 +148,7 @@ export class FrameStateService {
             }
 
             if (type === 'strike') {
-                // For a strike, set initial score of 10 plus previous frame's total
+                // Set this frame's total to previous + 10
                 const previousFrameTotal = frameIndex > 0 ? (currentFrames[frameIndex - 1].totalScore || 0) : 0;
                 const newTotal = previousFrameTotal + 10;
                 this.updateFrame(frameIndex, { 
@@ -156,18 +156,24 @@ export class FrameStateService {
                     totalScore: newTotal 
                 });
 
-                // If there was a previous strike, update its score
-                if (frameIndex > 0) {
-                    const previousFrame = currentFrames[frameIndex - 1];
-                    if (previousFrame.isStrike && frameIndex < 9) { // Not the last frame
-                        // For the previous strike, add 10 more points (20 total for two consecutive strikes)
-                        const previousFrameTotal = previousFrame.totalScore || 0;
-                        const updatedPreviousTotal = (previousFrameTotal - 10) + 20;
-                        this.updateFrame(frameIndex - 1, { totalScore: updatedPreviousTotal });
+                // If there are two previous consecutive strikes, update the frame two back
+                if (frameIndex > 1) {
+                    const twoFramesBack = currentFrames[frameIndex - 2];
+                    const oneFrameBack = currentFrames[frameIndex - 1];
+                    if (twoFramesBack.isStrike && oneFrameBack.isStrike) {
+                        // The frame two back should now be finalized as a triple strike: previous of two back + 30
+                        const twoBackPrevTotal = frameIndex > 2 ? (currentFrames[frameIndex - 3].totalScore || 0) : 0;
+                        const tripleStrikeTotal = twoBackPrevTotal + 30;
+                        this.updateFrame(frameIndex - 2, { totalScore: tripleStrikeTotal });
 
-                        // Update current frame's total to include the previous frame's total
-                        const currentFrameTotal = updatedPreviousTotal + 10;
-                        this.updateFrame(frameIndex, { totalScore: currentFrameTotal });
+                        // Now update the next frames to keep the running total
+                        // Update frameIndex-1 (second strike)
+                        const secondStrikeTotal = tripleStrikeTotal + 10;
+                        this.updateFrame(frameIndex - 1, { totalScore: secondStrikeTotal });
+
+                        // Update current frame (third strike)
+                        const thirdStrikeTotal = secondStrikeTotal + 10;
+                        this.updateFrame(frameIndex, { totalScore: thirdStrikeTotal });
                     }
                 }
             }
