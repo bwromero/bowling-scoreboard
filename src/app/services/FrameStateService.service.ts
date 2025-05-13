@@ -47,10 +47,15 @@ export class FrameStateService {
             const previousFrame = currentFrames[frameIndex - 1];
             if (previousFrame?.isStrike && frameIndex < 9) { // Not the last frame
                 let previousFrameTotal = previousFrame.totalScore || 0;
-                // Only add the new value being updated
-                let newValue = value || 0;
-                let updatedPreviousFrameTotal = previousFrameTotal + newValue;
-                this.updateFrame(frameIndex - 1, { totalScore: updatedPreviousFrameTotal });
+                // If current frame is also a strike, add 20 points to previous frame
+                if (frame.isStrike) {
+                    previousFrameTotal = (previousFrameTotal - 10) + 20; // Subtract previous 10 and add 20
+                } else {
+                    // Only add the new value being updated
+                    let newValue = value || 0;
+                    previousFrameTotal += newValue;
+                }
+                this.updateFrame(frameIndex - 1, { totalScore: previousFrameTotal });
             }
         }
 
@@ -121,6 +126,17 @@ export class FrameStateService {
                 const previousFrameTotal = frameIndex > 0 ? (currentFrames[frameIndex - 1].totalScore || 0) : 0;
                 const newTotal = previousFrameTotal + 10;
                 this.updateFrame(frameIndex, { firstRoll: null, totalScore: newTotal });
+
+                // If previous frame was a strike, update its score
+                if (frameIndex > 0) {
+                    const previousFrame = currentFrames[frameIndex - 1];
+                    if (previousFrame.isStrike && frameIndex < 9) { // Not the last frame
+                        let previousFrameTotal = previousFrame.totalScore || 0;
+                        // Add 10 more points to previous frame's total (20 total for two consecutive strikes)
+                        previousFrameTotal = (previousFrameTotal - 10) + 20;
+                        this.updateFrame(frameIndex - 1, { totalScore: previousFrameTotal });
+                    }
+                }
             }
             // Set total to 10 for spare if first roll exists
             else if (type === 'spare' && frame.firstRoll !== null) {
