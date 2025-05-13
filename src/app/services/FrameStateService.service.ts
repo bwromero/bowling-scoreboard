@@ -88,6 +88,14 @@ export class FrameStateService {
                 
                 this.updateFrame(frameIndex - 1, { totalScore: previousFrameTotal });
             }
+
+            if(previousFrame?.isSpare && frameIndex < 9) {
+                let previousFrameTotal = previousFrame.totalScore || 0;
+                if(frame.firstRoll !== null) {
+                    previousFrameTotal += frame.firstRoll;
+                }
+                this.updateFrame(frameIndex - 1, { totalScore: previousFrameTotal });
+            }
         }
 
         // Calculate current frame's total if it's not a strike
@@ -176,12 +184,12 @@ export class FrameStateService {
                         this.updateFrame(frameIndex, { totalScore: thirdStrikeTotal });
                     }
                 }
-            }
-            // Set total to 10 for spare if first roll exists
-            else if (type === 'spare' && frame.firstRoll !== null) {
+            } else if (type === 'spare') {
+                // For a spare, set total to 10 plus the next roll
                 const previousFrameTotal = frameIndex > 0 ? (currentFrames[frameIndex - 1].totalScore || 0) : 0;
-                const newTotal = previousFrameTotal + 10;
-                this.updateFrame(frameIndex, { totalScore: newTotal });
+                let newTotal = previousFrameTotal + 10;
+
+                this.updateFrame(frameIndex, { totalScore: newTotal});
             }
         }
     }

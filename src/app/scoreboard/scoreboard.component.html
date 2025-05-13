@@ -50,7 +50,9 @@
                                [name]="'scoreType-' + i" 
                                value="spare"
                                [checked]="frame.isSpare"
-                               (change)="onRadiobuttonClick('spare', i)">
+                               (change)="onRadiobuttonClick('spare', i)"
+                               [disabled]="frame.firstRoll === null"
+                               [class.disabled]="frame.firstRoll === null">
                         <label [for]="'spare-' + i">Spare</label><br>
                     </div>
                 </div>
