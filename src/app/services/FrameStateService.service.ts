@@ -69,12 +69,30 @@ export class FrameStateService {
   }
 
   setFrameType(frameIndex: number, type: 'strike' | 'spare'): void {
-    const updates: Partial<Frame> = {
-      isStrike: type === 'strike',
-      isSpare: type === 'spare'
-    };
-    this.updateFrame(frameIndex, updates);
-  }
+    const currentFrames = this.framesSubject.value;
+    const frame = currentFrames[frameIndex];
+    
+    // If clicking the same type that's already selected, unselect it
+    if ((type === 'strike' && frame.isStrike) || (type === 'spare' && frame.isSpare)) {
+        this.updateFrame(frameIndex, {
+            isStrike: false,
+            isSpare: false,
+        });
+        this.calculateFrameTotal(frameIndex);
+    } else {
+        this.updateFrame(frameIndex, {
+            isStrike: type === 'strike',
+            isSpare: type === 'spare'
+        });
+        
+        if (type === 'strike') {
+            const currentTotal = frame.totalScore || 0;
+            const previousFrameTotal = frameIndex > 0 ? (currentFrames[frameIndex - 1].totalScore || 0) : 0;
+            const newTotal = previousFrameTotal + 10;
+            this.updateFrame(frameIndex, { totalScore: newTotal });
+        }
+    }
+}
 
   getCurrentFrame(): Observable<Frame> {
     return new Observable(subscriber => {

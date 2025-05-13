@@ -10,7 +10,10 @@
                                name="" 
                                id="" 
                                [(ngModel)]="frame.firstRoll"
-                               (input)="onRollChange(i, 'firstRoll', frame.firstRoll)">
+                               (input)="onRollChange(i, 'firstRoll', frame.firstRoll)"
+                               [readonly]="frame.isStrike"
+                               [disabled]="frame.isStrike"
+                               [class.disabled]="frame.isStrike">
                     </div>
                     <div class="second" 
                          [class.hidden]="frames[i].isStrike || frames[i].isSpare"
