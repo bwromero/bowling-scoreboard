@@ -77,19 +77,29 @@ export class FrameStateService {
         this.updateFrame(frameIndex, {
             isStrike: false,
             isSpare: false,
+            totalScore: null  // Reset total score when unselecting
         });
-        this.calculateFrameTotal(frameIndex);
     } else {
-        this.updateFrame(frameIndex, {
-            isStrike: type === 'strike',
-            isSpare: type === 'spare'
-        });
+        // If switching from strike to spare or vice versa
+        if ((type === 'spare' && frame.isStrike) || (type === 'strike' && frame.isSpare)) {
+            this.updateFrame(frameIndex, {
+                isStrike: type === 'strike',
+                isSpare: type === 'spare',
+                totalScore: null  // Reset total score when switching types
+            });
+        } else {
+            // Otherwise, set the new type
+            this.updateFrame(frameIndex, {
+                isStrike: type === 'strike',
+                isSpare: type === 'spare'
+            });
+        }
         
+        // Add 10 to total score for strike
         if (type === 'strike') {
-            const currentTotal = frame.totalScore || 0;
             const previousFrameTotal = frameIndex > 0 ? (currentFrames[frameIndex - 1].totalScore || 0) : 0;
             const newTotal = previousFrameTotal + 10;
-            this.updateFrame(frameIndex, { totalScore: newTotal });
+            this.updateFrame(frameIndex, { firstRoll: null, totalScore: newTotal });
         }
     }
 }
