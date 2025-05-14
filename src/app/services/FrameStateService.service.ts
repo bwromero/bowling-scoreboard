@@ -15,6 +15,8 @@ export class FrameStateService {
             frameNumber: i + 1,
             firstRoll: null,
             secondRoll: null,
+            thirdRoll: null,  // For 10th frame
+            fourthRoll: null, // For 10th frame
             totalScore: null,
             isStrike: false,
             isSpare: false
@@ -32,7 +34,7 @@ export class FrameStateService {
         this.framesSubject.next(updatedFrames);
     }
 
-    updateRoll(frameIndex: number, rollType: 'firstRoll' | 'secondRoll', value: number | null): void {
+    updateRoll(frameIndex: number, rollType: 'firstRoll' | 'secondRoll' | 'thirdRoll' | 'fourthRoll', value: number | null): void {
         const currentFrames = this.framesSubject.value;
         const frame = currentFrames[frameIndex];
 
@@ -191,6 +193,17 @@ export class FrameStateService {
 
                 this.updateFrame(frameIndex, { totalScore: newTotal});
             }
+        }
+
+        if(frameIndex === 9) {
+            if(frame.isStrike) {
+                
+            }
+
+            if(frame.isSpare) {
+                
+            }
+
         }
     }
 

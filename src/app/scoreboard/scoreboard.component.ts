@@ -32,7 +32,7 @@ export class ScoreboardComponent {
     this.subscription.unsubscribe();
   }
 
-  onRollChange(frameIndex: number, rollType: 'firstRoll' | 'secondRoll', value: number | null) {
+  onRollChange(frameIndex: number, rollType: 'firstRoll' | 'secondRoll' | 'thirdRoll' | 'fourthRoll', value: number | null) {
     this.frameStateService.updateRoll(frameIndex, rollType, value);
   }
 
