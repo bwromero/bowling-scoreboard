@@ -41,26 +41,49 @@ export class FrameStateService {
         // Update the roll
         this.updateFrame(frameIndex, { [rollType]: value });
 
-        // Check for two frames back (for three consecutive strikes)
-        if (frameIndex > 1) {
-            const twoFramesBack = currentFrames[frameIndex - 2];
-            const previousFrame = currentFrames[frameIndex - 1];
+        // Special handling for 10th frame
+        if (frameIndex === 9) {
+            let total = 0;
             
-            // If we have three consecutive strikes
-            if (twoFramesBack?.isStrike && previousFrame?.isStrike && frame.isStrike && frameIndex < 8) {
-                let twoFramesBackTotal = 10; // Base score for strike
-                twoFramesBackTotal += 20; // Add 20 for the two consecutive strikes
-                // Add the total from three frames back if it exists
-                if (frameIndex > 2) {
-                    const threeFramesBack = currentFrames[frameIndex - 3];
-                    if (threeFramesBack?.totalScore !== null) {
-                        twoFramesBackTotal += threeFramesBack.totalScore;
-                    }
+            // Add previous frame's total if it exists
+            if (frameIndex > 0) {
+                const previousFrame = currentFrames[frameIndex - 1];
+                if (previousFrame.totalScore !== null) {
+                    total += previousFrame.totalScore;
                 }
-                this.updateFrame(frameIndex - 2, { totalScore: twoFramesBackTotal });
             }
+
+            // Calculate current frame's score based on the situation
+            if (frame.isStrike) {
+                // For a strike in 10th frame, add 10 plus bonus rolls
+                total += 10;
+                if (frame.thirdRoll !== null) {
+                    total += frame.thirdRoll;
+                }
+                if (frame.fourthRoll !== null) {
+                    total += frame.fourthRoll;
+                }
+            } else if (frame.isSpare) {
+                // For a spare in 10th frame, add 10 plus bonus roll
+                total += 10;
+                if (frame.thirdRoll !== null) {
+                    total += frame.thirdRoll;
+                }
+            } else {
+                // For an open frame, just add the rolls
+                if (frame.firstRoll !== null) {
+                    total += frame.firstRoll;
+                }
+                if (frame.secondRoll !== null) {
+                    total += frame.secondRoll;
+                }
+            }
+
+            this.updateFrame(frameIndex, { totalScore: total });
+            return;
         }
 
+        // Regular frame handling (non-10th frame)
         // If previous frame was a strike, update its score
         if (frameIndex > 0) {
             const previousFrame = currentFrames[frameIndex - 1];
@@ -139,7 +162,9 @@ export class FrameStateService {
             this.updateFrame(frameIndex, {
                 isStrike: false,
                 isSpare: false,
-                totalScore: null  // Reset total score when unselecting
+                totalScore: null,  // Reset total score when unselecting
+                thirdRoll: null,   // Reset extra rolls for 10th frame
+                fourthRoll: null
             });
         } else {
             // If switching from strike to spare or vice versa
@@ -147,7 +172,9 @@ export class FrameStateService {
                 this.updateFrame(frameIndex, {
                     isStrike: type === 'strike',
                     isSpare: type === 'spare',
-                    totalScore: null  // Reset total score when switching types
+                    totalScore: null,  // Reset total score when switching types
+                    thirdRoll: null,   // Reset extra rolls for 10th frame
+                    fourthRoll: null
                 });
             } else {
                 // Otherwise, set the new type
@@ -158,7 +185,7 @@ export class FrameStateService {
             }
 
             if (type === 'strike') {
-                // Set this frame's total to previous + 10
+                // For a strike, set initial score of 10 plus previous frame's total
                 const previousFrameTotal = frameIndex > 0 ? (currentFrames[frameIndex - 1].totalScore || 0) : 0;
                 const newTotal = previousFrameTotal + 10;
                 this.updateFrame(frameIndex, { 
@@ -189,21 +216,9 @@ export class FrameStateService {
             } else if (type === 'spare') {
                 // For a spare, set total to 10 plus the next roll
                 const previousFrameTotal = frameIndex > 0 ? (currentFrames[frameIndex - 1].totalScore || 0) : 0;
-                let newTotal = previousFrameTotal + 10;
-
-                this.updateFrame(frameIndex, { totalScore: newTotal});
+                const newTotal = previousFrameTotal + 10;
+                this.updateFrame(frameIndex, { totalScore: newTotal });
             }
-        }
-
-        if(frameIndex === 9) {
-            if(frame.isStrike) {
-                
-            }
-
-            if(frame.isSpare) {
-                
-            }
-
         }
     }
 
