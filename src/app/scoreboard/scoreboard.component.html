@@ -1,30 +1,84 @@
 <div class="main-container">
     <h3>Bowling Scoreboard</h3>
     <div class="scoreboard-container">
-        <div class="frame" *ngFor="let frame of [1,2,3,4,5,6,7,8,9,10]; let i = index">
-            <h1 class="frame-number">Frame {{ i + 1 }}</h1>
+        <div class="frame" *ngFor="let frame of frames; let i = index" [class.last-frame]="i === 9 && (frame.isSpare || frame.isStrike)">
+            <h1 class="frame-number">Frame {{ frame.frameNumber }}</h1>
             <div class="score-container">
                 <div class="score-rolls">
-                    <div class="first"><input type="number" name="" id=""></div>
-                    <div class="second"><input type="number" name="" id=""></div>
+                    <div class="first">
+                        <input type="number" 
+                               name="" 
+                               id="" 
+                               [(ngModel)]="frame.firstRoll"
+                               (input)="onRollChange(i, 'firstRoll', frame.firstRoll)"
+                               [readonly]="frame.isStrike"
+                               [disabled]="frame.isStrike"
+                               [class.disabled]="frame.isStrike">
+                    </div>
+                    <div class="second" 
+                         [class.hidden]="frames[i].isStrike || frames[i].isSpare"
+                         [class.strike]="frames[i].isStrike" 
+                         [class.spare]="frames[i].isSpare">
+                        <input type="number" 
+                               name="" 
+                               id="" 
+                               [(ngModel)]="frame.secondRoll"
+                               (input)="onRollChange(i, 'secondRoll', frame.secondRoll)">
+                    </div>
+                </div>
+
+                <!-- Extra rolls for 10th frame -->
+                <div class="score-rolls" *ngIf="i === 9 && (frame.isSpare || frame.isStrike)">
+                    <div class="third" *ngIf="frame.isStrike && (frame.isSpare || !frame.isSpare)"
+                         [class.hidden]="!frame.isStrike && !frame.isSpare"
+                         [class.strike]="frame.isStrike" 
+                         [class.spare]="frame.isSpare">
+                        <input type="number" 
+                               name="" 
+                               id="" 
+                               [(ngModel)]="frame.thirdRoll"
+                               (input)="onRollChange(i, 'thirdRoll', frame.thirdRoll)">
+                    </div>
+                    <!-- Only show fourth roll if first roll was a strike -->
+                    <div class="fourth" *ngIf="frame.isStrike || frame.isSpare"
+                         [class.hidden]="!frame.isStrike"
+                         [class.strike]="frame.isStrike">
+                        <input type="number" 
+                               name="" 
+                               id="" 
+                               [(ngModel)]="frame.fourthRoll"
+                               (input)="onRollChange(i, 'fourthRoll', frame.fourthRoll)">
+                    </div>
                 </div>
 
                 <div class="box">
                     <div class="score-total">
                         <label for="scoreTotal">Total</label>
-                        <input type="number" name="scoreTotal" id="scoreTotal">
+                        <input type="number" 
+                               name="scoreTotal" 
+                               id="scoreTotal" 
+                               [ngModel]="frame.totalScore" 
+                               readonly>
                     </div>
 
                     <div class="score-type">
-                        <input type="radio" id="strike" name="scoreType" value="strike">
-                        <label for="strike">Strike</label><br>
-                        <input type="radio" id="spare" name="scoreType" value="spare">
-                        <label for="spare">Spare</label><br>
+                        <input type="radio" 
+                               [id]="'strike-' + i" 
+                               [name]="'scoreType-' + i" 
+                               value="strike"
+                               [checked]="frame.isStrike"
+                               (change)="onRadiobuttonClick('strike', i)">
+                        <label [for]="'strike-' + i">Strike</label><br>
+                        <input type="radio" 
+                               [id]="'spare-' + i" 
+                               [name]="'scoreType-' + i" 
+                               value="spare"
+                               [checked]="frame.isSpare"
+                               (change)="onRadiobuttonClick('spare', i)">
+                        <label [for]="'spare-' + i">Spare</label><br>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
-
 </div>

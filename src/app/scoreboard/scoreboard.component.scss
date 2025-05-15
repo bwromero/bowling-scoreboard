@@ -1,5 +1,5 @@
 input {
-    width: 1rem;
+    width: 1.2rem;
     outline: none;
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
@@ -25,7 +25,7 @@ input {
         .frame {
             border: 2px solid black;
             width: 7rem;
-            height: 8rem;
+            height: 9rem;
 
             &-number {
                 font-size: 1rem;
@@ -55,9 +55,10 @@ input {
                             }
                             
                             input {
-                                font-size: 2rem;
-                                width: 1.5rem;
+                                font-size: 1.5rem;
+                                width: 2rem;
                                 height: 1.5rem;
+                                border: none;
                             }
                         }
                     }
@@ -67,7 +68,7 @@ input {
                     display: flex;
                     justify-content: flex-end;
 
-                    .first {
+                    .first, .third, .fourth {
                         width: 100%;
                         display: flex;
                         align-items: center;
@@ -79,11 +80,40 @@ input {
                         border-left: 2px solid black;
                         border-bottom: 2px solid black;
                         width: 1.5rem;
+                        position: relative;
+                        &.hidden {
+                            background-color: #e0e0e0; // or any color you prefer
+                            input {
+                                visibility: hidden;
+                            }
+                        }
+                        &.strike {
+                            background-color: black;
+                        }
+                        &.spare {
+                            background: white; // or your preferred background
+                            overflow: hidden;
+                            &::after {
+                                content: '';
+                                position: absolute;
+                                left: 0;
+                                bottom: 0;
+                                width: 0;
+                                height: 0;
+                                border-left: 40px solid transparent;  // width of the div
+                                border-bottom: 40px solid black;      // height and color of the triangle
+                                transform: rotate(0);
+                            }
+                        }
                     }
                 }
 
 
             }
+        }
+
+        .last-frame {
+            height: 11rem;
         }
     }
 }
